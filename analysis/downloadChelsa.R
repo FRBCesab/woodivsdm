@@ -12,22 +12,6 @@
 
 
 
-#' ---------------------------------------------------------------------------- @LoadAddings
-
-source(file.path("R", "listChelsaCmip5.R"))
-source(file.path("R", "wgetChelsa.R"))
-
-
-#' ---------------------------------------------------------------------------- @Parameters
-
-horizon  <- "1979-2013"
-
-vars     <- 1:19
-varnames <- paste0("0", vars)
-varnames <- substr(varnames, nchar(varnames) - 1, nchar(varnames))
-
-
-
 #' ---------------------------------------------------------------------------- @Check
 
 rasters <- list.files(
@@ -37,11 +21,13 @@ rasters <- list.files(
 
 rasters <- gsub("CHELSA_bio10_|\\.tif", "", rasters)
 
-varnames <- varnames[-which(varnames %in% rasters)]
+cat("\n", emo::ji("check"), "Checking Chelsa rasters")
 
-if (length(varnames) > 0) {
+vars <- varnames[-which(varnames %in% rasters)]
 
-  vars <- as.numeric(varnames)
+if (length(vars) > 0) {
+
+  vars <- as.numeric(vars)
 
 
 #' ---------------------------------------------------------------------------- @DownloadChelsaData
@@ -51,4 +37,10 @@ if (length(varnames) > 0) {
     horizons  = horizon,
     path      = path_climate_data
   )
+
+  cat("\n", emo::ji("check"), "Downloading Chelsa rasters")
+
+} else {
+
+  cat("\n", emo::ji("check"), "Existing Chelsa rasters")
 }

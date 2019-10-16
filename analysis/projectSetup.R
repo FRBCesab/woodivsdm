@@ -15,6 +15,7 @@
 
 rm(list = ls())
 
+cat("\n=======================================\n")
 
 #' ----------------------------------------------------------------------------- @InstallCranLibs
 
@@ -36,15 +37,15 @@ if (!("emo" %in% installed.packages())) devtools::install_github("hadley/emo")
 
 #' ----------------------------------------------------------------------------- @LoadLibs
 
-i_p <- unlist(lapply(cran_packages, require, character.only = TRUE))
+i_p <- unlist(lapply(cran_packages, require, character.only = TRUE, quietly = TRUE))
 
 if (sum(i_p) == length(cran_packages)) {
 
-  cat("\n", emo::ji("computer"), ">>> All packages loaded !\n")
+  cat("\n", emo::ji("check"), "Loading packages")
 
 } else {
 
-  cat("\n", emo::ji("warning"), ">>> Some packages failed to load !\n")
+  cat("\n", emo::ji("warning"), " Some packages failed to load !")
 
 }
 
@@ -81,6 +82,18 @@ sapply(1:length(dir_names), function(i) {
   )
 })
 
-cat("\n", emo::ji("folder"), ">>> All folders created !\n")
+cat("\n", emo::ji("check"), "Creating directories")
 
 rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p"))
+
+
+
+#' ---------------------------------------------------------------------------- @Parameters
+
+horizon  <- "1979-2013"
+
+varnames <- c(4, 6, 12, 14)
+varnames <- paste0("0", varnames)
+varnames <- substr(varnames, nchar(varnames) - 1, nchar(varnames))
+
+cat("\n", emo::ji("check"), "Defining user parameters")
