@@ -71,3 +71,5 @@ cat("\n", emo::ji("check"), "Saving cropped Chelsa rasters")
 
 save(climate, file = file.path("output", paste0("CHELSA_biovars_cropped")))
 save(study_area, file = file.path("output", paste0("Mediterranean_area_cropped")))
+
+cat("\n")

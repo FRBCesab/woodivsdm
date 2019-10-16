@@ -97,3 +97,5 @@ varnames <- paste0("0", varnames)
 varnames <- substr(varnames, nchar(varnames) - 1, nchar(varnames))
 
 cat("\n", emo::ji("check"), "Defining user parameters")
+
+cat("\n")

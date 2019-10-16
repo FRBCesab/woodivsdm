@@ -44,3 +44,5 @@ if (length(vars) > 0) {
 
   cat("\n", emo::ji("check"), "Existing Chelsa rasters")
 }
+
+cat("\n")
