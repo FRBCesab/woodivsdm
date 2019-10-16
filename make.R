@@ -29,3 +29,8 @@ source(file.path("analysis", "downloadChelsa.R"))
 #' ----------------------------------------------------------------------------- @CleanClimateData
 
 source(file.path("analysis", "cleanChelsa.R"))
+
+
+#' ----------------------------------------------------------------------------- @CleanSpeciesData
+
+source(file.path("analysis", "cleanSpecies.R"))
