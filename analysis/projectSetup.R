@@ -1,0 +1,86 @@
+#' @title Setup project
+#'
+#' @description
+#' ...
+#'   ...
+#'   ...
+#'
+#' @author Nicolas Casajus, \email{nicolas.casajus@@fondationbiodiversite.fr}
+#'
+#' @date 15/10/2019
+#'
+
+
+
+
+rm(list = ls())
+
+
+#' ----------------------------------------------------------------------------- @InstallCranLibs
+
+cran_packages <- c(
+  "devtools",
+  "sf",
+  "biomod2",
+  "stringr"
+)
+
+n_i_p <- cran_packages[!(cran_packages %in% installed.packages())]
+lapply(n_i_p, install.packages, dependencies = TRUE)
+
+
+#' ----------------------------------------------------------------------------- @InstallDevLibs
+
+if (!("emo" %in% installed.packages())) devtools::install_github("hadley/emo")
+
+
+#' ----------------------------------------------------------------------------- @LoadLibs
+
+i_p <- unlist(lapply(cran_packages, require, character.only = TRUE))
+
+if (sum(i_p) == length(cran_packages)) {
+
+  cat("\n", emo::ji("computer"), ">>> All packages loaded !\n")
+
+} else {
+
+  cat("\n", emo::ji("warning"), ">>> Some packages failed to load !\n")
+
+}
+
+
+
+#' ----------------------------------------------------------------------------- @CreateFolders
+
+# script_names <- list.files(path = here::here("src"), pattern = "^[0-9]{3}.+\\.R$")
+# script_names <- script_names[-1]
+# dir_names    <- gsub("\\.R", "", script_names)
+# dir_vars     <- stringr::str_extract(dir_names, "^[0-9]{3}[a-z]?")
+# dir_vars     <- paste0("res_dir_", dir_vars)
+
+dir_names <- c(
+  file.path("data", "climate")
+)
+
+dir_vars <- c(
+  "path_climate_data"
+)
+
+sapply(1:length(dir_names), function(i) {
+
+  dir.create(
+    path          = dir_names[i],
+    showWarnings  = FALSE,
+    recursive     = TRUE
+  )
+
+  assign(
+    x      = dir_vars[i],
+    value  = dir_names[i],
+    envir  = .GlobalEnv
+  )
+})
+
+cat("\n", emo::ji("folder"), ">>> All folders created !\n")
+
+rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p"))
