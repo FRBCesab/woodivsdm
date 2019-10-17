@@ -34,3 +34,7 @@ source(file.path("analysis", "cleanChelsa.R"))
 #' ----------------------------------------------------------------------------- @CleanSpeciesData
 
 source(file.path("analysis", "cleanSpecies.R"))
+
+#' ----------------------------------------------------------------------------- @RunBiomod
+
+source(file.path("analysis", "runBiomod.R"))
