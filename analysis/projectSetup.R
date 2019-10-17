@@ -15,6 +15,8 @@
 
 rm(list = ls())
 
+compt <- Sys.time()
+
 cat("\n=======================================\n")
 
 #' ----------------------------------------------------------------------------- @InstallCranLibs
@@ -60,11 +62,13 @@ if (sum(i_p) == length(cran_packages)) {
 # dir_vars     <- paste0("res_dir_", dir_vars)
 
 dir_names <- c(
-  file.path("data", "climate")
+  file.path("data", "climate"),
+  "output"
 )
 
 dir_vars <- c(
-  "path_climate_data"
+  "path_climate_data",
+  "output"
 )
 
 sapply(1:length(dir_names), function(i) {
@@ -90,11 +94,31 @@ rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p"))
 
 #' ---------------------------------------------------------------------------- @Parameters
 
+lambert  <- "+init=epsg:3035"
+
 horizon  <- "1979-2013"
 
 varnames <- c(4, 6, 12, 14)
 varnames <- paste0("0", varnames)
 varnames <- substr(varnames, nchar(varnames) - 1, nchar(varnames))
+
+
+spnames  <- c(
+  "AALB",  # montagneuse
+  "ABOR",  # east
+  "MCOM",  # costal
+  "APIN",  # restricted west
+  "CGRA",  # restricted west
+  "QCOC",  # italy
+  "QPUB",  # center + east
+  "AUNE",  # widespread
+  "CBET",  # east
+  "CCOG",  # Italy
+  "AMON"   # widespread
+)
+
+
+
 
 cat("\n", emo::ji("check"), "Defining user parameters")
 
