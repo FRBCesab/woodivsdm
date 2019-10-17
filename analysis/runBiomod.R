@@ -69,7 +69,8 @@ for (spname in spnames) {
     resp.name       = spname,
     PA.nb.rep       = 1,
     PA.nb.absences  = 4 * sum(xy[ , 'occurrence'], na.rm = TRUE),
-    PA.strategy     = "random"
+    PA.strategy     = "disk",
+    PA.dist.max     = 100000
   )
 
   bm.mod <- BIOMOD_Modeling(
@@ -158,7 +159,7 @@ for (spname in spnames) {
 
 }
 
-setwd("...")
+setwd("..")
 
 
 
