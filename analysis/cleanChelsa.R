@@ -65,6 +65,23 @@ climate <- mask(
 )
 
 
+#' ---------------------------------------------------------------------------- @ProjectStudyArea
+
+cat("\n", emo::ji("check"), "Projecting study area")
+
+study_area <- sf::st_transform(
+  x    = study_area,
+  crs  = lambert
+)
+
+
+#' ---------------------------------------------------------------------------- @ProjectClimateRasters
+
+cat("\n", emo::ji("check"), "Projecting Chelsa rasters")
+
+climate <- projectRaster(from = climate, crs = lambert)
+
+
 #' ---------------------------------------------------------------------------- @ExportLayers
 
 cat("\n", emo::ji("check"), "Saving cropped Chelsa rasters")
