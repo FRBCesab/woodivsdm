@@ -118,6 +118,42 @@ spnames  <- c(
 )
 
 
+### Models Parameters             -------------------
+
+mod.models           <- c("RF")
+mod.n.rep            <-  1
+mod.data.split       <- 80
+mod.var.import       <-  0
+mod.models.eval.meth <- "TSS"
+prevalence           <- 0.5
+
+
+### Algo Options                  -------------------
+
+bm.opt <- biomod2::BIOMOD_ModelingOptions(
+  GLM = list(
+    type              = "quadratic",
+    interaction.level = 0,
+    test              = "AIC"
+  ),
+  GBM = list(
+    n.trees = 5000
+  ),
+  GAM = list(
+    k = 3
+  )
+)
+
+
+### Ensemble Parameters           -------------------
+
+ens.eval.metric                   <- "TSS"
+ens.eval.metric.quality.threshold <- 0.01
+ens.models.eval.meth              <- "TSS"
+ens.prob.mean.weight              <- TRUE
+ens.prob.mean.weight.decay        <- "proportional"
+ens.committee.averaging           <- TRUE
+
 
 
 cat("\n", emo::ji("check"), "Defining user parameters")

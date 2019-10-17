@@ -9,6 +9,7 @@
 #'
 
 
+compt <- Sys.time()
 
 #' ---------------------------------------------------------------------------- @ImportSpeciesOcc
 
@@ -41,35 +42,35 @@ climate <- get(
     )
   )
 )
+climate <- stack(climate)
 
 
+setwd("output")
+
+for (spname in spnames) {
+# spname <- spnames[1]
 
 
+  occ <- occs[occs[ , "to_aggregate_with"] == spname, ]
 
+  cells <- unique(cellFromXY(climate, occ[ , c("coordX_laea", "coordY_laea")]))
+  xy <- as.data.frame(xyFromCell(climate, 1:length(subset(climate, 1))))
+  xy[ , "occurrence"]     <- NA
+  xy[cells, "occurrence"] <- 1
 
+  pos <- which(!is.na(subset(climate, 1)[]))
+  xy <- xy[pos, ]
 
-### Format Data for BIOMOD        -------------------
 
   bm.form <- BIOMOD_FormatingData(
-    resp.var   = sp.occ,
-    expl.var   = vars,
-    resp.xy    = sp.xy,
-    resp.name  = spname
+    resp.var        = xy[ , 'occurrence'],
+    expl.var        = climate,
+    resp.xy         = xy[ , c("x", "y")],
+    resp.name       = spname,
+    PA.nb.rep       = 1,
+    PA.nb.absences  = 4 * sum(xy[ , 'occurrence'], na.rm = TRUE),
+    PA.strategy     = "random"
   )
-
-
-### Change Working Directory      -------------------
-
-  setwd(
-    paste(
-      root_path,
-      "outputs",
-      sep = .Platform$file.sep
-    )
-  )
-
-
-### Build BIOMOD Single Models    -------------------
 
   bm.mod <- BIOMOD_Modeling(
     data              = bm.form,
@@ -77,15 +78,12 @@ climate <- get(
     models.options    = bm.opt,
     NbRunEval         = mod.n.rep,
     DataSplit         = mod.data.split,
-    Prevalence        = prevalence,
+    Prevalence        = NULL,
     VarImport         = mod.var.import,
     models.eval.meth  = mod.models.eval.meth,
     do.full.models    = FALSE,
     modeling.id       = "biomod"
   )
-
-
-### Build BIOMOD Ensemble Models  -------------------
 
   bm.em.all <- BIOMOD_EnsembleModeling(
     modeling.output                = bm.mod,
@@ -100,10 +98,67 @@ climate <- get(
     committee.averaging            = ens.committee.averaging
   )
 
+  bm.ef.all <- BIOMOD_EnsembleForecasting(
+    EM.output        = bm.em.all,
+    new.env          = climate,
+    output.format    = ".grd",
+    proj.name        = "ENSEMBLE_all",
+    selected.models  = "all",
+    binary.meth      = ens.models.eval.meth
+  )
+
+  tss <- bm.mod@models.evaluation@val[ , "Testing.data", , , ]
+
+  projs <- list.files(
+    path        = file.path(
+      spname
+    ),
+    full.names  = TRUE,
+    recursive   = TRUE,
+    pattern     = paste0("^proj_ENSEMBLE_all_", spname, "_ensemble.grd$")
+  )
+
+  projs  <- stack(projs)
+  projs  <- subset(projs, grep("wmean", names(projs)))
+  projs  <- mean(projs)
+  bins   <- projs
+
+  cutoff <- get(
+    load(
+      file.path(
+        spname,
+        "models",
+        "biomod",
+        paste0(
+          spname,
+          "_EMwmeanByTSS_mergedAlgo_mergedRun_mergedData"
+        )
+      )
+    )
+  )
+
+  cutoff <- cutoff@model_evaluation["TSS", "Cutoff"]
+
+  bins[] <- ifelse(projs[] < cutoff, 0, 1)
 
 
+  png(
+    file       = paste0(spname, ".png"),
+    width      = 12.00,
+    height     =  8.00,
+    units      = "in",
+    res        = 600,
+    pointsize  = 6
+  )
 
+  plot(bins)
+  points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
+  title(spname)
+  dev.off()
 
+}
+
+setwd("...")
 
 
 
