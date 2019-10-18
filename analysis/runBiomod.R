@@ -45,11 +45,14 @@ climate <- get(
 climate <- stack(climate)
 
 
-setwd("output")
+setwd("output/rep10")
+
+
 
 for (spname in spnames) {
-# spname <- spnames[1]
 
+
+#' ---------------------------------------------------------------------------- @SubsetSpeciesOccurrences
 
   occ <- occs[occs[ , "to_aggregate_with"] == spname, ]
 
@@ -62,16 +65,22 @@ for (spname in spnames) {
   xy <- xy[pos, ]
 
 
+#' ---------------------------------------------------------------------------- @SetBiomodParameters
+
   bm.form <- BIOMOD_FormatingData(
     resp.var        = xy[ , 'occurrence'],
     expl.var        = climate,
     resp.xy         = xy[ , c("x", "y")],
     resp.name       = spname,
-    PA.nb.rep       = 1,
-    PA.nb.absences  = 4 * sum(xy[ , 'occurrence'], na.rm = TRUE),
-    PA.strategy     = "disk",
-    PA.dist.max     = 100000
+    PA.nb.rep       = 10,
+    PA.nb.absences  = 2 * sum(xy[ , 'occurrence'], na.rm = TRUE),
+    PA.strategy     = "random"
+    # PA.strategy     = "disk",
+    # PA.dist.max     = 100000
   )
+
+
+#' ---------------------------------------------------------------------------- @RunBiomodAlgorithms
 
   bm.mod <- BIOMOD_Modeling(
     data              = bm.form,
@@ -86,6 +95,9 @@ for (spname in spnames) {
     modeling.id       = "biomod"
   )
 
+
+#' ---------------------------------------------------------------------------- @RunEnsembleModel
+
   bm.em.all <- BIOMOD_EnsembleModeling(
     modeling.output                = bm.mod,
     chosen.models                  = 'all',
@@ -99,6 +111,9 @@ for (spname in spnames) {
     committee.averaging            = ens.committee.averaging
   )
 
+
+#' ---------------------------------------------------------------------------- @RunModelProjections
+
   bm.ef.all <- BIOMOD_EnsembleForecasting(
     EM.output        = bm.em.all,
     new.env          = climate,
@@ -108,7 +123,8 @@ for (spname in spnames) {
     binary.meth      = ens.models.eval.meth
   )
 
-  tss <- bm.mod@models.evaluation@val[ , "Testing.data", , , ]
+
+#' ---------------------------------------------------------------------------- @AverageProjections
 
   projs <- list.files(
     path        = file.path(
@@ -123,6 +139,9 @@ for (spname in spnames) {
   projs  <- subset(projs, grep("wmean", names(projs)))
   projs  <- mean(projs)
   bins   <- projs
+
+
+#' ---------------------------------------------------------------------------- @ConvertInBinary
 
   cutoff <- get(
     load(
@@ -143,6 +162,8 @@ for (spname in spnames) {
   bins[] <- ifelse(projs[] < cutoff, 0, 1)
 
 
+#' ---------------------------------------------------------------------------- @Maps
+
   png(
     file       = paste0(spname, ".png"),
     width      = 12.00,
@@ -159,12 +180,18 @@ for (spname in spnames) {
 
 }
 
-setwd("..")
+setwd("../..")
 
 
+#' ---------------------------------------------------------------------------- @PrintModelPerformances
 
-
-
-
-
-cat("\n", Sys.time() - compt)
+for (spname in spnames) {
+  eval <- get(
+    load(
+      file.path(
+        "output", "distance", spname, ".BIOMOD_DATA", "biomod", "models.evaluation"
+      )
+    )
+  )
+  cat(spname, " : ", round(mean(eval[ , "Testing.data", , , ]), 3), "\n")
+}
