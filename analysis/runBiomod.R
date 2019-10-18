@@ -45,7 +45,8 @@ climate <- get(
 climate <- stack(climate)
 
 
-setwd("output/rep10")
+opath <- getwd()
+setwd(path_biomod)
 
 
 
@@ -74,9 +75,8 @@ for (spname in spnames) {
     resp.name       = spname,
     PA.nb.rep       = 10,
     PA.nb.absences  = 2 * sum(xy[ , 'occurrence'], na.rm = TRUE),
-    PA.strategy     = "random"
-    # PA.strategy     = "disk",
-    # PA.dist.max     = 100000
+    PA.strategy     = ifelse(method == "rep10", "random", "disk"),
+    PA.dist.max     = 100000
   )
 
 
@@ -180,7 +180,7 @@ for (spname in spnames) {
 
 }
 
-setwd("../..")
+setwd(opath)
 
 
 #' ---------------------------------------------------------------------------- @PrintModelPerformances

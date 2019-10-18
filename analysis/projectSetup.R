@@ -61,14 +61,18 @@ if (sum(i_p) == length(cran_packages)) {
 # dir_vars     <- stringr::str_extract(dir_names, "^[0-9]{3}[a-z]?")
 # dir_vars     <- paste0("res_dir_", dir_vars)
 
+method <- "rep10" # or distance
+
 dir_names <- c(
   file.path("data", "climate"),
-  "output"
+  "output",
+  file.path("output", method)
 )
 
 dir_vars <- c(
   "path_climate_data",
-  "output"
+  "output",
+  "path_biomod"
 )
 
 sapply(1:length(dir_names), function(i) {
