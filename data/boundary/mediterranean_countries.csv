@@ -1,23 +1,28 @@
-Pays
-Espagne
-France
-Monaco
-Italie
-Malte
-Slovénie
-Croatie
-Bosnie-Herzégovine
-Monténégro
-Albanie
-Grèce
-Turquie
-Chypre
-Syrie
-Liban
-Israël
-Bande de Gaza (Palestine)
-Égypte
-Libye
-Tunisie
-Algérie
-Maroc
+Pays,Code
+Spain,ESP
+France,FRA
+Monaco,MCO
+Italy,ITA
+Malta,MLT
+Slovenia,SVN
+Croatia,HRV
+Bosnia and Herzegovina,BIH
+Montenegro,MNE
+Albania,ALB
+Greece,GRC
+Turkey,TUR
+Cyprus,CYP
+Northern Cyprus,XNC
+Syria,SYR
+Lebanon,LBN
+Israel,ISR
+Palestina,PSE
+Egypt,EGY
+Libya,LBY
+Tunisia,TUN
+Algeria,DZA
+Morocco,MAR
+San-Marino,SMR
+Vatican city,VAT
+Macedonia,MKD
+Portugal,PRT
