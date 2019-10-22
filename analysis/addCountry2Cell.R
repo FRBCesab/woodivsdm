@@ -9,6 +9,8 @@
 #'
 
 
+cat("\n", emo::ji("check"), "Setting Pixel-Country matches")
+
 
 #' ---------------------------------------------------------------------------- @ImportStudyGrid
 
@@ -53,11 +55,13 @@ for (j in 1:nrow(countries_list)) {
 
 #' ---------------------------------------------------------------------------- @CheckIfShapefileIsDownloaded
 
-  iso3 <- as.character(countries_list[j, "Code"])
+  iso3 <- as.character(countries_list[j, "Code"  ])
 
   pos <- which(fls == iso3)
 
   if (length(pos) == 0) {
+
+    cat("\n")
 
     download.file(
       url       = paste0(
@@ -130,3 +134,5 @@ if (length(pos) > 0) {
 #' ---------------------------------------------------------------------------- @SaveData
 
 save(country_by_pixel, file = file.path("output", paste0("Pixel_country_matches")))
+
+cat("\n")
