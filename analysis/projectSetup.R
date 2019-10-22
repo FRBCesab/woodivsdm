@@ -52,25 +52,35 @@ if (sum(i_p) == length(cran_packages)) {
 }
 
 
+#' ----------------------------------------------------------------------------- @LoadRFunctions
+
+rfun <- list.files(
+  path        = "R",
+  pattern     = "\\.R$",
+  full.names  = TRUE
+)
+
+rfun <- unlist(lapply(rfun, source, verbose = FALSE))
+
+
 
 #' ----------------------------------------------------------------------------- @CreateFolders
 
-# script_names <- list.files(path = here::here("src"), pattern = "^[0-9]{3}.+\\.R$")
-# script_names <- script_names[-1]
-# dir_names    <- gsub("\\.R", "", script_names)
-# dir_vars     <- stringr::str_extract(dir_names, "^[0-9]{3}[a-z]?")
-# dir_vars     <- paste0("res_dir_", dir_vars)
-
-method <- "rep10" # or distance
 
 dir_names <- c(
   file.path("data", "climate"),
-  "output",
-  file.path("output", method)
+  file.path("data", "gadm"),
+  file.path("data", "boundary"),
+  file.path("data", "species"),
+  file.path("output"),
+  file.path("output", "biomod")
 )
 
 dir_vars <- c(
   "path_climate_data",
+  "path_gadm_data",
+  "path_boundary_data",
+  "path_species_data",
   "output",
   "path_biomod"
 )
@@ -92,11 +102,13 @@ sapply(1:length(dir_names), function(i) {
 
 cat("\n", emo::ji("check"), "Creating directories")
 
-rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p"))
+rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p", "rfun"))
 
 
 
-#' ---------------------------------------------------------------------------- @Parameters
+#' ---------------------------------------------------------------------------- @GeneralParameters
+
+cat("\n", emo::ji("check"), "Defining user parameters")
 
 lambert  <- "+init=epsg:3035"
 
@@ -122,17 +134,9 @@ spnames  <- c(
 )
 
 
-### Models Parameters             -------------------
+#' ---------------------------------------------------------------------------- @BiomodAlgorithmsOptions
 
-mod.models           <- c("RF")
-mod.n.rep            <-  1
-mod.data.split       <- 80
-mod.var.import       <-  0
-mod.models.eval.meth <- "TSS"
-prevalence           <- 0.5
-
-
-### Algo Options                  -------------------
+cat("\n", emo::ji("check"), "Defining biomod2 algorithms parameters")
 
 bm.opt <- biomod2::BIOMOD_ModelingOptions(
   GLM = list(
@@ -149,7 +153,21 @@ bm.opt <- biomod2::BIOMOD_ModelingOptions(
 )
 
 
-### Ensemble Parameters           -------------------
+#' ---------------------------------------------------------------------------- @BiomodGeneralOptions
+
+cat("\n", emo::ji("check"), "Defining biomod2 general parameters")
+
+mod.models           <- c("RF")
+mod.n.rep            <-  1
+mod.data.split       <- 80
+mod.var.import       <-  0
+mod.models.eval.meth <- "TSS"
+prevalence           <-  0.5
+
+
+#' ---------------------------------------------------------------------------- @BiomodEnsembleOptions
+
+cat("\n", emo::ji("check"), "Defining biomod2 ensemble parameters")
 
 ens.eval.metric                   <- "TSS"
 ens.eval.metric.quality.threshold <- 0.01
@@ -158,8 +176,5 @@ ens.prob.mean.weight              <- TRUE
 ens.prob.mean.weight.decay        <- "proportional"
 ens.committee.averaging           <- TRUE
 
-
-
-cat("\n", emo::ji("check"), "Defining user parameters")
 
 cat("\n")

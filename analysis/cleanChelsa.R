@@ -14,8 +14,7 @@
 
 study_area <- sf::st_read(
   dsn    = file.path(
-    "data",
-    "boundary",
+    path_boundary_data,
     "study_area",
     "Med_Study_area_with_countries_and_islands_111017.shp"
   ),
@@ -27,8 +26,7 @@ study_area <- sf::st_read(
 
 sampling <- read.csv2(
   file.path(
-    "data",
-    "species",
+    path_species_data,
     "woodiv_country_sampling_effort_table.csv"
   )
 )

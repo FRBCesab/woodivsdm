@@ -14,16 +14,23 @@
 
 #' ---------------------------------------------------------------------------- @Check
 
+cat("\n", emo::ji("check"), "Checking Chelsa rasters")
+
 rasters <- list.files(
   path     = file.path(path_climate_data, horizon),
   pattern  = "\\.tif$"
 )
 
-rasters <- gsub("CHELSA_bio10_|\\.tif", "", rasters)
+if (length(rasters) > 0) {
 
-cat("\n", emo::ji("check"), "Checking Chelsa rasters")
+  rasters <- gsub("CHELSA_bio10_|\\.tif", "", rasters)
 
-vars <- varnames[-which(varnames %in% rasters)]
+  vars <- varnames[-which(varnames %in% rasters)]
+
+} else {
+
+  vars <- varnames
+}
 
 if (length(vars) > 0) {
 
@@ -32,6 +39,8 @@ if (length(vars) > 0) {
 
 #' ---------------------------------------------------------------------------- @DownloadChelsaData
 
+  cat("\n")
+  
   wget_chelsa(
     vars      = vars,
     horizons  = horizon,
