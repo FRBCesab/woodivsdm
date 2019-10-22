@@ -2,3 +2,4 @@
 
 export(list_chelsa_cmip5)
 export(wget_chelsa)
+export(xyFromPoly)
