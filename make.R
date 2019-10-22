@@ -9,13 +9,6 @@
 #'
 
 
-
-#' ---------------------------------------------------------------------------- @LoadAddings
-
-source(file.path("R", "listChelsaCmip5.R"))
-source(file.path("R", "wgetChelsa.R"))
-
-
 #' ----------------------------------------------------------------------------- @ProjectSetup
 
 source(file.path("analysis", "projectSetup.R"))
@@ -31,10 +24,15 @@ source(file.path("analysis", "downloadChelsa.R"))
 source(file.path("analysis", "cleanChelsa.R"))
 
 
+#' ----------------------------------------------------------------------------- @AddCountryToCell
+
+source(file.path("analysis", "addCountry2Cell.R"))
+
+
 #' ----------------------------------------------------------------------------- @CleanSpeciesData
 
-source(file.path("analysis", "cleanSpecies.R"))
+# source(file.path("analysis", "cleanSpecies.R"))
 
 #' ----------------------------------------------------------------------------- @RunBiomod
 
-source(file.path("analysis", "runBiomod.R"))
+# source(file.path("analysis", "runBiomod.R"))
