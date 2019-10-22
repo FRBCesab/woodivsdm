@@ -31,7 +31,7 @@ source(file.path("analysis", "addCountry2Cell.R"))
 
 #' ----------------------------------------------------------------------------- @CleanSpeciesData
 
-# source(file.path("analysis", "cleanSpecies.R"))
+source(file.path("analysis", "cleanSpecies.R"))
 
 #' ----------------------------------------------------------------------------- @RunBiomod
 

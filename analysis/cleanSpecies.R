@@ -17,8 +17,7 @@ cat("\n", emo::ji("check"), "Loading species occurrences")
 occs <- get(
   load(
     file.path(
-      "data",
-      "species",
+      path_species_data,
       "WOODIV_working_file_310719.RData"
     )
   )
