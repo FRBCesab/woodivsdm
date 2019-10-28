@@ -9,11 +9,20 @@
 #'
 
 
-compt <- Sys.time()
-
-#' ---------------------------------------------------------------------------- @ImportSpeciesOcc
+#' ---------------------------------------------------------------------------- @ImportSpeciesInfos
 
 cat("\n", emo::ji("check"), "Loading species occurrences")
+
+sp_infos <- read.csv(
+  file.path(
+    "data",
+    "species",
+    "spp_area.csv"
+  )
+)
+
+
+#' ---------------------------------------------------------------------------- @ImportSpeciesOcc
 
 occs <- get(
   load(
@@ -28,6 +37,20 @@ occs <- get(
 #' ---------------------------------------------------------------------------- @SelectSpecies
 
 occs <- occs[occs[ , "to_aggregate_with"] %in% spnames, ]
+
+
+#' ---------------------------------------------------------------------------- @ImportPixelCountryRelation
+
+cat("\n", emo::ji("check"), "Loading pixel-country relation")
+
+countries <- get(
+  load(
+    file.path(
+      "output",
+      "Pixel_country_matches"
+    )
+  )
+)
 
 
 #' ---------------------------------------------------------------------------- @ImportClimateData
@@ -45,12 +68,15 @@ climate <- get(
 climate <- stack(climate)
 
 
+#' ---------------------------------------------------------------------------- @ChangePath
+
 opath <- getwd()
 setwd(path_biomod)
 
 
 
 for (spname in spnames) {
+
 
 
 #' ---------------------------------------------------------------------------- @SubsetSpeciesOccurrences
@@ -61,9 +87,21 @@ for (spname in spnames) {
   xy <- as.data.frame(xyFromCell(climate, 1:length(subset(climate, 1))))
   xy[ , "occurrence"]     <- NA
   xy[cells, "occurrence"] <- 1
+  xy[ , "cell_id"] <- 1:length(subset(climate, 1))
 
   pos <- which(!is.na(subset(climate, 1)[]))
   xy <- xy[pos, ]
+
+  xy <- merge(xy, countries[ , c("cell_id", "country")], by = "cell_id", all = FALSE)
+
+  italy <- sp_infos[sp_infos[ , "species"] == spname, "italy"]
+
+  if (italy == 0) {
+
+    xy <- xy[xy[ , "country"] != "Italy", ]
+    
+  }
+
 
 
 #' ---------------------------------------------------------------------------- @SetBiomodParameters
@@ -75,7 +113,7 @@ for (spname in spnames) {
     resp.name       = spname,
     PA.nb.rep       = 10,
     PA.nb.absences  = 2 * sum(xy[ , 'occurrence'], na.rm = TRUE),
-    PA.strategy     = ifelse(method == "rep10", "random", "disk"),
+    PA.strategy     = "random",
     PA.dist.max     = 100000
   )
 
@@ -165,7 +203,7 @@ for (spname in spnames) {
 #' ---------------------------------------------------------------------------- @Maps
 
   png(
-    file       = paste0(spname, ".png"),
+    file       = paste0(spname, "_bins.png"),
     width      = 12.00,
     height     =  8.00,
     units      = "in",
@@ -174,7 +212,21 @@ for (spname in spnames) {
   )
 
   plot(bins)
-  points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
+  # points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
+  title(spname)
+  dev.off()
+
+  png(
+    file       = paste0(spname, "_prbs.png"),
+    width      = 12.00,
+    height     =  8.00,
+    units      = "in",
+    res        = 600,
+    pointsize  = 6
+  )
+
+  plot(projs)
+  # points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
   title(spname)
   dev.off()
 
@@ -189,7 +241,7 @@ for (spname in spnames) {
   eval <- get(
     load(
       file.path(
-        "output", "distance", spname, ".BIOMOD_DATA", "biomod", "models.evaluation"
+        "output", spname, ".BIOMOD_DATA", "biomod", "models.evaluation"
       )
     )
   )

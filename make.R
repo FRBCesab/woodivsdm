@@ -35,4 +35,4 @@ source(file.path("analysis", "cleanSpecies.R"))
 
 #' ----------------------------------------------------------------------------- @RunBiomod
 
-# source(file.path("analysis", "runBiomod.R"))
+source(file.path("analysis", "runBiomod.R"))

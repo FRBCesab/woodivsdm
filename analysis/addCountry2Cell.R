@@ -127,7 +127,7 @@ pos <- which(duplicated(country_by_pixel[ , "cell_id"]))
 
 if (length(pos) > 0) {
 
-  country_by_pixel <- country_by_pixel[pos, ]
+  country_by_pixel <- country_by_pixel[-pos, ]
 }
 
 
