@@ -99,12 +99,13 @@ for (spname in spnames) {
   if (italy == 0) {
 
     xy <- xy[xy[ , "country"] != "Italy", ]
-    
+
   }
 
 
 
 #' ---------------------------------------------------------------------------- @SetBiomodParameters
+
 
   bm.form <- BIOMOD_FormatingData(
     resp.var        = xy[ , 'occurrence'],
@@ -118,7 +119,9 @@ for (spname in spnames) {
   )
 
 
+
 #' ---------------------------------------------------------------------------- @RunBiomodAlgorithms
+
 
   bm.mod <- BIOMOD_Modeling(
     data              = bm.form,
@@ -134,7 +137,9 @@ for (spname in spnames) {
   )
 
 
+
 #' ---------------------------------------------------------------------------- @RunEnsembleModel
+
 
   bm.em.all <- BIOMOD_EnsembleModeling(
     modeling.output                = bm.mod,
@@ -150,7 +155,9 @@ for (spname in spnames) {
   )
 
 
+
 #' ---------------------------------------------------------------------------- @RunModelProjections
+
 
   bm.ef.all <- BIOMOD_EnsembleForecasting(
     EM.output        = bm.em.all,
@@ -162,7 +169,9 @@ for (spname in spnames) {
   )
 
 
+
 #' ---------------------------------------------------------------------------- @AverageProjections
+
 
   projs <- list.files(
     path        = file.path(
@@ -179,7 +188,9 @@ for (spname in spnames) {
   bins   <- projs
 
 
+
 #' ---------------------------------------------------------------------------- @ConvertInBinary
+
 
   cutoff <- get(
     load(
@@ -200,7 +211,24 @@ for (spname in spnames) {
   bins[] <- ifelse(projs[] < cutoff, 0, 1)
 
 
-#' ---------------------------------------------------------------------------- @Maps
+
+#' ---------------------------------------------------------------------------- @GetModelPerformances
+
+
+  eval <- get(
+    load(
+      file.path(
+        spname, ".BIOMOD_DATA", "biomod", "models.evaluation"
+      )
+    )
+  )
+
+  eval <- round(mean(eval[ , "Testing.data", , , ]), 3)
+
+
+
+#' ---------------------------------------------------------------------------- @PredMaps
+
 
   png(
     file       = paste0(spname, "_bins.png"),
@@ -212,8 +240,7 @@ for (spname in spnames) {
   )
 
   plot(bins)
-  # points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
-  title(spname)
+  title(paste0(spname, " (TSS = ", eval, ")"))
   dev.off()
 
   png(
@@ -226,24 +253,47 @@ for (spname in spnames) {
   )
 
   plot(projs)
-  # points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
-  title(spname)
+  title(paste0(spname, " (TSS = ", eval, ")"))
   dev.off()
 
-}
+
+
+#' ---------------------------------------------------------------------------- @ObsMaps
+
+
+  obs <- bins
+  obs[][!is.na(obs[])] <- 0
+  obs[][xy[!is.na(xy[ , "occurrence"]), "cell_id"]] <- 1
+
+  png(
+    file       = paste0(spname, "_obs.png"),
+    width      = 12.00,
+    height     =  8.00,
+    units      = "in",
+    res        = 600,
+    pointsize  = 6
+  )
+
+  plot(obs)
+  points(xy[!is.na(xy$occurrence), c("x", "y")], pch = "+")
+  title(paste0(spname, " (TSS = ", eval, ")"))
+  dev.off()
+
+
+
+#' ---------------------------------------------------------------------------- @SaveRasters
+
+
+  ras <- stack(obs, projs, bins)
+  names(ras) <- paste(spname, c("obs", "prbs", "bins"), sep = "_")
+
+  save(ras, file = paste0(spname, "_predictions.RData"))
+
+} # e_o spnames loop
+
+
+
+#' ---------------------------------------------------------------------------- @ResetWD
+
 
 setwd(opath)
-
-
-#' ---------------------------------------------------------------------------- @PrintModelPerformances
-
-for (spname in spnames) {
-  eval <- get(
-    load(
-      file.path(
-        "output", spname, ".BIOMOD_DATA", "biomod", "models.evaluation"
-      )
-    )
-  )
-  cat(spname, " : ", round(mean(eval[ , "Testing.data", , , ]), 3), "\n")
-}
