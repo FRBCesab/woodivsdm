@@ -1,30 +1,28 @@
-#' @title Add Country to Grid Pixels
+#' Add Country to Grid Pixels
 #'
-#' @description
-#' This R script...
+#' This R script adds country label to each grid cell of the study area
 #'
 #' @author Nicolas Casajus, \email{nicolas.casajus@@fondationbiodiversite.fr}
-#'
-#' @date 22/10/2019
-#'
+#' @date 2020/03/03
+
+
 
 
 cat("\n", emo::ji("check"), "Setting Pixel-Country matches")
 
 
-#' ---------------------------------------------------------------------------- @ImportStudyGrid
-
-ras <- get(
-  load(
-    file.path(
-      output,
-      "CHELSA_biovars_cropped"
-    )
+## Import Study Grid ----
+  
+ras <- raster::stack(
+  x = file.path(
+    "output",
+    "climate",
+    paste0("CHELSA_bio10_", varnames, "_cropped.tif")
   )
 )
 
 
-#' ---------------------------------------------------------------------------- @ImportMediterraneanCountries
+## Import Mediterranean Countries ----
 
 countries_list <- read.csv(
   file.path(
@@ -34,7 +32,7 @@ countries_list <- read.csv(
 )
 
 
-#' ---------------------------------------------------------------------------- @ListGADMShapefiles
+## List GADM Shapefiles ----
 
 fls <- list.files(
   path = file.path(
@@ -46,20 +44,20 @@ fls <- list.files(
 fls <- gsub("_0_sf\\.rds", "", fls)
 
 
-#' ---------------------------------------------------------------------------- @LoopOnCountries
+## Loop On Countries ----
 
 country_by_pixel <- data.frame()
 
 for (j in 1:nrow(countries_list)) {
 
 
-#' ---------------------------------------------------------------------------- @CheckIfShapefileIsDownloaded
+  ## Check if Shapefile is already downloaded ----
 
-  iso3 <- as.character(countries_list[j, "Code"  ])
+  iso3 <- as.character(countries_list[j, "Code"])
 
   pos <- which(fls == iso3)
 
-  if (length(pos) == 0) {
+  if (!length(pos)) {
 
     cat("\n")
 
@@ -80,7 +78,7 @@ for (j in 1:nrow(countries_list)) {
   }
 
 
-#' ---------------------------------------------------------------------------- @ImportShapefile
+## Import Shapefiles ----
 
   shp <- readRDS(
     file.path(
@@ -93,12 +91,12 @@ for (j in 1:nrow(countries_list)) {
   )
 
 
-#' ---------------------------------------------------------------------------- @GetCellIDForTheCountry
+  ## Get cells ID overlapping the country <j> ----
 
-  cells_infos <- xyFromPoly(x = ras, y = shp, na_rm = TRUE)
+  cells_infos <- xyFromPoly(x = subset(ras, 1), y = shp, na_rm = TRUE)
 
 
-#' ---------------------------------------------------------------------------- @AddCountryLabel
+  ## Add Country Label ----
 
   if (nrow(cells_infos) > 0) {
 
@@ -112,7 +110,7 @@ for (j in 1:nrow(countries_list)) {
 }
 
 
-#' ---------------------------------------------------------------------------- @CleanCountryLabels
+## Clean Country Labels ----
 
 country_by_pixel[ , "country"] <- as.character(country_by_pixel[ , "country"])
 country_by_pixel[ , "country"] <- gsub("Northern Cyprus", "Cyprus", country_by_pixel[ , "country"])
@@ -121,17 +119,16 @@ country_by_pixel[ , "country"] <- gsub("Vatican city", "Italy", country_by_pixel
 country_by_pixel[ , "country"] <- gsub("Monaco", "France", country_by_pixel[ , "country"])
 
 
-#' ---------------------------------------------------------------------------- @RemoveDuplicates
+## Remove Duplicates ----
 
 pos <- which(duplicated(country_by_pixel[ , "cell_id"]))
 
-if (length(pos) > 0) {
-
+if (length(pos)) {
   country_by_pixel <- country_by_pixel[-pos, ]
 }
 
 
-#' ---------------------------------------------------------------------------- @SaveData
+## Export Data ----
 
 save(country_by_pixel, file = file.path("output", paste0("Pixel_country_matches")))
 

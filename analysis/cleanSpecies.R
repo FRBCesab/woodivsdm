@@ -1,16 +1,13 @@
-#' @title Clean Species occurrences
+#' Clean Species Occurrences
 #'
-#' @description
-#' This R script...
+#' This R script selects species occurrences
 #'
 #' @author Nicolas Casajus, \email{nicolas.casajus@@fondationbiodiversite.fr}
-#'
-#' @date 16/10/2019
-#'
+#' @date 2020/03/03
 
 
 
-#' ---------------------------------------------------------------------------- @ImportSpeciesOcc
+## Import Species Occurrences ----
 
 cat("\n", emo::ji("check"), "Loading species occurrences")
 
@@ -26,8 +23,7 @@ occs <- get(
 occs <- occs@data
 
 
-
-#' ---------------------------------------------------------------------------- @ConvertDataType
+## Convert Data Type ----
 
 to_char <- c("Idgrid", "status", "source", "scientific_name", "to_aggregate_with")
 for (col in to_char) occs[ , col] <- as.character(occs[ , col])
@@ -36,19 +32,16 @@ to_num  <- c("Xcentroid", "Ycentroid")
 for (col in to_num) occs[ , col] <- as.numeric(as.character(occs[ , col]))
 
 
-
-#' ---------------------------------------------------------------------------- @SelectData
+## Select Data ----
 
 cat("\n", emo::ji("check"), "Subsetting species occurrences")
 
 occs <- occs[!is.na(occs[ , "Idgrid"]), ]
-
 occs <- occs[which(occs[ , "status"] %in% c("N", "N?")), ]
-
 occs <- occs[which(!(occs[ , "source"] %in% "Serra-Diaz" & !(occs[ , "country"] == "Cyprus"))), ]
 
 
-#' ---------------------------------------------------------------------------- @RemoveDuplicats
+## Remove Duplicates ----
 
 cat("\n", emo::ji("check"), "Removing duplicated occurrences")
 
@@ -61,7 +54,7 @@ pos <- which(
 if (length(pos) > 0) occs <- occs[-pos, ]
 
 
-#' ---------------------------------------------------------------------------- @ExportOccurrences
+## Export Occurrences ----
 
 cat("\n", emo::ji("check"), "Saving cleaned species data")
 save(occs, file = file.path("output", paste0("species_occurrences_cleaned")))

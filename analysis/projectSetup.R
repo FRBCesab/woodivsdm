@@ -1,70 +1,78 @@
-#' @title Setup project
+#' Setup Project
 #'
-#' @description
-#' ...
-#'   ...
-#'   ...
+#' This R script sets the WOODIV SDM project by:
+#'   - installing missing required packages
+#'   - loading required packages
+#'   - loading required R functions
+#'   - creating subfolders
+#'   - setting project parameters
 #'
 #' @author Nicolas Casajus, \email{nicolas.casajus@@fondationbiodiversite.fr}
-#'
-#' @date 15/10/2019
-#'
+#' @date 2020/03/02
 
 
 
 
 rm(list = ls())
 
-compt <- Sys.time()
 
-cat("\n=======================================\n")
-
-#' ----------------------------------------------------------------------------- @InstallCranLibs
+## Install CRAN Packages ----
 
 cran_packages <- c(
-  "devtools",
   "sf",
+  "pROC",
+  "rgdal",
+  "raster",
   "biomod2",
-  "stringr"
+  "stringr",
+  "devtools"
 )
 
-n_i_p <- cran_packages[!(cran_packages %in% installed.packages())]
-lapply(n_i_p, install.packages, dependencies = TRUE)
+nip <- cran_packages[!(cran_packages %in% installed.packages())]
+lapply(nip, install.packages, dependencies = TRUE)
 
 
-#' ----------------------------------------------------------------------------- @InstallDevLibs
+## Install GitHub Packages ----
 
-if (!("emo" %in% installed.packages())) devtools::install_github("hadley/emo")
-
-
-#' ----------------------------------------------------------------------------- @LoadLibs
-
-i_p <- unlist(lapply(cran_packages, require, character.only = TRUE, quietly = TRUE))
-
-if (sum(i_p) == length(cran_packages)) {
-
-  cat("\n", emo::ji("check"), "Loading packages")
-
-} else {
-
-  cat("\n", emo::ji("warning"), " Some packages failed to load !")
-
+if (!("emo" %in% installed.packages())) {
+  devtools::install_github("hadley/emo")
 }
 
 
-#' ----------------------------------------------------------------------------- @LoadRFunctions
+## Load All Packages ----
 
-rfun <- list.files(
-  path        = "R",
-  pattern     = "\\.R$",
-  full.names  = TRUE
+ip <- unlist(
+  lapply(
+    X              = cran_packages, 
+    FUN            = require, 
+    character.only = TRUE, 
+    quietly        = TRUE
+  )
 )
 
-rfun <- unlist(lapply(rfun, source, verbose = FALSE))
+if (sum(ip) == length(cran_packages)) {
+  cat("\n", emo::ji("check"), "Loading packages")
+} else {
+  stop("Some packages failed to load!")
+}
 
 
+## Load R Functions ----
 
-#' ----------------------------------------------------------------------------- @CreateFolders
+rfun <- unlist(
+  lapply(
+    list.files(
+      path        = "R",
+      pattern     = "\\.R$",
+      full.names  = TRUE
+    ), 
+    source, 
+    verbose = FALSE
+  )
+)
+
+
+## Create subfolders ----
 
 
 dir_names <- c(
@@ -73,7 +81,8 @@ dir_names <- c(
   file.path("data", "boundary"),
   file.path("data", "species"),
   file.path("output"),
-  file.path("output", "biomod")
+  file.path("output", "biomod"),
+  file.path("output", "biomod", "archives")
 )
 
 dir_vars <- c(
@@ -82,7 +91,8 @@ dir_vars <- c(
   "path_boundary_data",
   "path_species_data",
   "output",
-  "path_biomod"
+  "path_biomod",
+  "path_biomod_archives"
 )
 
 sapply(1:length(dir_names), function(i) {
@@ -102,11 +112,11 @@ sapply(1:length(dir_names), function(i) {
 
 cat("\n", emo::ji("check"), "Creating directories")
 
-rm(list = c("dir_names", "dir_vars", "cran_packages", "n_i_p", "i_p", "rfun"))
+rm(list = c("dir_names", "dir_vars", "cran_packages", "nip", "ip", "rfun"))
 
 
 
-#' ---------------------------------------------------------------------------- @GeneralParameters
+## Setup General Parameters ----
 
 cat("\n", emo::ji("check"), "Defining user parameters")
 
@@ -119,62 +129,30 @@ varnames <- paste0("0", varnames)
 varnames <- substr(varnames, nchar(varnames) - 1, nchar(varnames))
 
 
-spnames  <- c(
-  "AALB",  # montagneuse
-  "ABOR",  # east
-  "MCOM",  # costal
-  "APIN",  # restricted west
-  "CGRA",  # restricted west
-  "QCOC",  # italy
-  "QPUB",  # center + east
-  "AUNE",  # widespread
-  "CBET",  # east
-  "CCOG",  # Italy
-  "AMON"   # widespread
-)
-
-
-#' ---------------------------------------------------------------------------- @BiomodAlgorithmsOptions
-
-cat("\n", emo::ji("check"), "Defining biomod2 algorithms parameters")
-
-bm.opt <- biomod2::BIOMOD_ModelingOptions(
-  GLM = list(
-    type              = "quadratic",
-    interaction.level = 0,
-    test              = "AIC"
-  ),
-  GBM = list(
-    n.trees = 5000
-  ),
-  GAM = list(
-    k = 3
+sp_infos <- read.csv(
+  file.path(
+    "data",
+    "species",
+    "spp_area.csv"
   )
 )
 
+spnames <- as.character(sp_infos[ , "species"])
 
-#' ---------------------------------------------------------------------------- @BiomodGeneralOptions
+
+
+## Setup BIOMOD Parameters ----
 
 cat("\n", emo::ji("check"), "Defining biomod2 general parameters")
 
-mod.models           <- c("RF")
-mod.n.rep            <-  1
-mod.data.split       <- 80
-mod.var.import       <-  0
+mod.models           <- "RF"
+pa.nb.rep            <- 10
+mod.n.rep            <- 10
+mod.data.split       <- 70
+nb.absences          <-  1
+mod.var.import       <- 10
 mod.models.eval.meth <- "TSS"
-prevalence           <-  0.5
-
-
-#' ---------------------------------------------------------------------------- @BiomodEnsembleOptions
-
-cat("\n", emo::ji("check"), "Defining biomod2 ensemble parameters")
-
-ens.eval.metric                   <- "TSS"
-ens.eval.metric.quality.threshold <- 0.01
-ens.models.eval.meth              <- "TSS"
-ens.prob.mean.weight              <- TRUE
-ens.prob.mean.weight.decay        <- "proportional"
-ens.committee.averaging           <- TRUE
+prevalence           <- NULL
 
 
 cat("\n")
