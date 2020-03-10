@@ -3,3 +3,5 @@ data/climate/*
 data/gadm/*
 output
 .Rproj.user
+figures/*
+report/report.pdf

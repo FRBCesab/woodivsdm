@@ -1,0 +1,52 @@
+---
+title: "WOODIV Species Distribution Modeling - Atlas"
+author: "Nicolas Casajus"
+date: "3/10/2020"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+geometry: margin=1in
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r content, results='asis'}
+txt <- ""
+
+spnames <- list.dirs(
+  path       = file.path("..", "output", "biomod"),
+  recursive  = FALSE,
+  full.names = FALSE
+)
+spnames <- spnames[grep("^[A-Z]{4}$", spnames)]
+
+for (spname in spnames) {
+  
+  obs <- raster::raster(
+    file.path(
+      "..", "output", "biomod", spname, "predictions",
+      paste0(spname, "_obs.tif")
+    )
+  )
+  
+  n_occ <- sum(obs[], na.rm = TRUE)
+  
+  if (n_occ > 9) {
+  
+    txt <- c(txt, "\\newpage")
+    txt <- c(txt, "\\clearpage")
+    txt <- c(txt, paste0("![](../figures/evaluation/", spname, ".png)"))
+    txt <- c(txt, "\\newpage")
+    txt <- c(txt, paste0("![](../figures/mapping/", spname, "_p10.png)"))
+    txt <- c(txt, "\\newpage")
+    txt <- c(txt, paste0("![](../figures/mapping/", spname, "_tss.png)"))
+    txt <- c(txt, "\\newpage")
+  }
+}
+
+cat(paste0(txt, collapse = "\n"))
+```
+
