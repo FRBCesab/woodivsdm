@@ -43,9 +43,9 @@ if (!("emo" %in% installed.packages())) {
 
 ip <- unlist(
   lapply(
-    X              = cran_packages, 
-    FUN            = require, 
-    character.only = TRUE, 
+    X              = cran_packages,
+    FUN            = require,
+    character.only = TRUE,
     quietly        = TRUE
   )
 )
@@ -65,8 +65,8 @@ rfun <- unlist(
       path        = "R",
       pattern     = "\\.R$",
       full.names  = TRUE
-    ), 
-    source, 
+    ),
+    source,
     verbose = FALSE
   )
 )
@@ -133,11 +133,13 @@ sp_infos <- read.csv(
   file.path(
     "data",
     "species",
-    "spp_area.csv"
-  )
+    "spp_area_sampling_italian_peninsula.csv"
+  ),
+  sep = ";"
 )
 
 spnames <- as.character(sp_infos[ , "species"])
+spnames <- spnames[-c(1:91)]
 
 
 

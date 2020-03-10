@@ -113,7 +113,8 @@ wget_chelsa <- function(path = ".", vars = NULL, horizons = NULL, gcms = NULL, r
         recursive     = TRUE
       )
 
-      base_url <- "https://www.wsl.ch/lud/chelsa/data/bioclim/integer/CHELSA_bio10_"
+      # base_url <- "https://www.wsl.ch/lud/chelsa/data/bioclim/integer/CHELSA_bio10_"
+      base_url <- "https://envidatrepo.wsl.ch/uploads/chelsa/chelsa_V1/bioclim/integer/CHELSA_bio10_"
 
       for (var in vars) {
 

@@ -16,22 +16,22 @@ source(file.path("analysis", "projectSetup.R"))
 
 #' ----------------------------------------------------------------------------- @DownloadClimateData
 
-source(file.path("analysis", "downloadChelsa.R"))
+# source(file.path("analysis", "downloadChelsa.R"))
 
 
 #' ----------------------------------------------------------------------------- @CleanClimateData
 
-source(file.path("analysis", "cleanChelsa.R"))
+# source(file.path("analysis", "cleanChelsa.R"))
 
 
 #' ----------------------------------------------------------------------------- @AddCountryToCell
 
-source(file.path("analysis", "addCountry2Cell.R"))
+# source(file.path("analysis", "addCountry2Cell.R"))
 
 
 #' ----------------------------------------------------------------------------- @CleanSpeciesData
 
-source(file.path("analysis", "cleanSpecies.R"))
+# source(file.path("analysis", "cleanSpecies.R"))
 
 #' ----------------------------------------------------------------------------- @RunBiomod
 
