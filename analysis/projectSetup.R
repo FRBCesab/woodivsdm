@@ -139,7 +139,7 @@ sp_infos <- read.csv(
 )
 
 spnames <- as.character(sp_infos[ , "species"])
-spnames <- spnames[-c(1:91)]
+spnames <- spnames[-c(1:93)]
 
 
 
@@ -152,7 +152,7 @@ pa.nb.rep            <- 10
 mod.n.rep            <- 10
 mod.data.split       <- 70
 nb.absences          <-  1
-mod.var.import       <- 10
+mod.var.import       <-  0
 mod.models.eval.meth <- "TSS"
 prevalence           <- NULL
 

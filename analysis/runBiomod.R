@@ -261,6 +261,7 @@ for (spname in spnames) {
 
     ## Average projections (probs) ----
 
+    metrics[ , "TSS"] <- ifelse(metrics[ , "TSS"] < 0, 0, metrics[ , "TSS"])
     weights <- metrics[ , "TSS"] / sum(metrics[ , "TSS"])
 
     avers   <- projs
